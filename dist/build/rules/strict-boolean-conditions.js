@@ -15,6 +15,7 @@
  * limitations under the License.
  */
 import * as ts from "typescript";
+import { ESLintUtils } from '@typescript-eslint/utils';
 const OPTION_ALLOW_NULL_UNION = "allow-null-union";
 const OPTION_ALLOW_UNDEFINED_UNION = "allow-undefined-union";
 const OPTION_ALLOW_STRING = "allow-string";
@@ -54,7 +55,7 @@ const rule = {
         type: 'problem'
     },
     create(context) {
-        const parserServices = context.parserServices;
+        const parserServices = ESLintUtils.getParserServices(context);
         const program = parserServices.program;
         const rawOptions = context.options[0] || ['allow-null-union', 'allow-undefined-union', 'allow-boolean-or-undefined'];
         const options = parseOptions(rawOptions, true);

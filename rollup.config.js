@@ -13,7 +13,8 @@ export default {
     'eslint',
     'typescript',
     'tsutils',
-    'eslint-utils'
+    'eslint-utils',
+    '@typescript-eslint/utils'
   ],
   output: {
     file: 'dist/index.js',

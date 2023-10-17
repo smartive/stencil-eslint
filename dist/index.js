@@ -5,6 +5,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 var ts = require('typescript');
 var eslintUtils = require('eslint-utils');
 var tsutils = require('tsutils');
+var utils = require('@typescript-eslint/utils');
 
 function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
 
@@ -172,7 +173,7 @@ const stencilLifecycle = [
     [SyntaxKind.ReadonlyKeyword]: 'readonly'
 });
 
-const rule$n = {
+const rule$o = {
     meta: {
         docs: {
             description: 'This rule catches Stencil public methods that are not async.',
@@ -215,6 +216,34 @@ const rule$n = {
                                 .replace('async private', 'private async');
                             return fixer.replaceText(node, result);
                         }
+                    });
+                }
+            } });
+    }
+};
+
+const rule$n = {
+    meta: {
+        docs: {
+            description: 'This rule catches Stencil Props defaulting to true.',
+            category: 'Possible Errors',
+            recommended: true
+        },
+        schema: [],
+        type: 'problem',
+    },
+    create(context) {
+        const stencil = stencilComponentContext();
+        return Object.assign(Object.assign({}, stencil.rules), { 'PropertyDefinition': (node) => {
+                var _a;
+                const propDecorator = getDecorator(node, 'Prop');
+                if (!(stencil.isComponent() && propDecorator)) {
+                    return;
+                }
+                if (((_a = node.value) === null || _a === void 0 ? void 0 : _a.value) === true) {
+                    context.report({
+                        node: node,
+                        message: `Boolean properties decorated with @Prop() should default to false`
                     });
                 }
             } });
@@ -1407,7 +1436,7 @@ const rule$2 = {
         type: 'problem'
     },
     create(context) {
-        const parserServices = context.parserServices;
+        const parserServices = utils.ESLintUtils.getParserServices(context);
         const program = parserServices.program;
         const rawOptions = context.options[0] || ['allow-null-union', 'allow-undefined-union', 'allow-boolean-or-undefined'];
         const options = parseOptions(rawOptions, true);
@@ -1759,10 +1788,11 @@ const SUGGESTIONS = {
 
 var index$1 = {
     'ban-side-effects': rule$3,
+    'ban-default-true': rule$n,
     'ban-exported-const-enums': rule$1,
     'dependency-suggestions': rule,
     'strict-boolean-conditions': rule$2,
-    'async-methods': rule$n,
+    'async-methods': rule$o,
     'ban-prefix': rule$m,
     'class-pattern': rule$l,
     'decorators-context': rule$k,
@@ -1838,6 +1868,7 @@ var recommended = {
     ],
     rules: {
         '@stencil-community/strict-boolean-conditions': 1,
+        '@stencil-community/ban-default-true': 1,
         '@stencil-community/ban-exported-const-enums': 2,
         // '@stencil-community/ban-side-effects': 2,
         '@stencil-community/strict-mutable': 2,
@@ -1870,6 +1901,7 @@ var strict = {
         "plugin:@stencil-community/recommended",
     ],
     rules: {
+        '@stencil-community/ban-default-true': 2,
         '@stencil-community/strict-boolean-conditions': 2,
         // Resets
         "@typescript-eslint/camelcase": 0,

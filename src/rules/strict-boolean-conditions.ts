@@ -17,6 +17,8 @@
 import * as ts from "typescript";
 
 import { Rule } from 'eslint';
+import { ESLintUtils } from '@typescript-eslint/utils';
+import { Node } from "estree";
 
 const OPTION_ALLOW_NULL_UNION = "allow-null-union";
 const OPTION_ALLOW_UNDEFINED_UNION = "allow-undefined-union";
@@ -59,7 +61,7 @@ const rule: Rule.RuleModule = {
   },
 
   create(context): Rule.RuleListener {
-    const parserServices = context.parserServices;
+    const parserServices = ESLintUtils.getParserServices(context as any);
     const program = parserServices.program;
     const rawOptions = context.options[0] || ['allow-null-union', 'allow-undefined-union', 'allow-boolean-or-undefined']
     const options = parseOptions(rawOptions, true);
@@ -115,7 +117,7 @@ const rule: Rule.RuleModule = {
             // OK; It might be null/undefined.
             return;
           }
-          const originalNode = parserServices.tsNodeToESTreeNodeMap.get(node);
+          const originalNode = parserServices.tsNodeToESTreeNodeMap.get(node) as Node;
           context.report({
             node: originalNode,
             message: showFailure(location, failure, isUnionType(type), options),
@@ -126,7 +128,7 @@ const rule: Rule.RuleModule = {
 
     return {
       'Program': (node: any) => {
-        const sourceFile = parserServices.esTreeNodeToTSNodeMap.get(node);
+        const sourceFile = parserServices.esTreeNodeToTSNodeMap.get(node) as ts.SourceFile;
         walk(sourceFile);
       }
     };
